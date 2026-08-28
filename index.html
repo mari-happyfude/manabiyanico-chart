@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>インナーチャイルド診断｜学び舎にこ</title>
+<style>
+  /* ===== Brand tokens =====
+     学び舎にこ / マインドセルフケア — soft botanical.
+     Palette: sage/clover greens, warm cream paper, dusty-rose accent, soft ink.
+     Display: Zen Maru Gothic (rounded, gentle). Body: Zen Kaku Gothic New. */
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+
+  :root{
+    --paper:#f4f6ee;
+    --paper-2:#eef2e4;
+    --card:#fffdf8;
+    --ink:#4a5340;
+    --ink-soft:#7c866f;
+    --sage:#8faa72;
+    --sage-deep:#6d8a55;
+    --clover:#a9c48a;
+    --rose:#e6a3a0;
+    --rose-deep:#d98a86;
+    --gold:#e9c98d;
+    --line:#dfe6d2;
+    --shadow:0 12px 40px rgba(109,138,85,.14);
+    --shadow-sm:0 4px 16px rgba(109,138,85,.10);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #fbfcf6 0%, transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, #eaf1df 0%, transparent 55%),
+      var(--paper);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  .wrap{max-width:620px;margin:0 auto;padding:0 20px}
+
+  /* floating leaves (ambient, decorative) */
+  .leaf{position:fixed;pointer-events:none;opacity:.12;z-index:0;filter:blur(.2px)}
+  .leaf svg{display:block}
+  .leaf-1{top:6%;left:-30px;width:120px;transform:rotate(-12deg)}
+  .leaf-2{top:38%;right:-40px;width:150px;transform:rotate(20deg)}
+  .leaf-3{bottom:5%;left:-24px;width:110px;transform:rotate(8deg)}
+
+  /* ===== screens ===== */
+  .screen{display:none;position:relative;z-index:1;padding:44px 0 64px;animation:fade .6s ease both}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* ---- intro ---- */
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:"Zen Maru Gothic";font-weight:500;
+    font-size:.82rem;letter-spacing:.14em;color:var(--sage-deep);
+    background:#fff;border:1px solid var(--line);
+    padding:7px 16px;border-radius:999px;box-shadow:var(--shadow-sm);
+    margin-bottom:26px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--clover)}
+
+  h1{
+    font-family:"Zen Maru Gothic";font-weight:700;
+    font-size:2.15rem;line-height:1.5;letter-spacing:.02em;
+    color:var(--ink);margin-bottom:8px;
+  }
+  h1 .accent{color:var(--rose-deep)}
+  .sub{font-family:"Zen Maru Gothic";color:var(--sage-deep);font-weight:500;font-size:1.02rem;margin-bottom:30px}
+
+  .intro-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:22px;padding:30px 26px;box-shadow:var(--shadow);
+    position:relative;overflow:hidden;
+  }
+  .intro-card::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:4px;
+    background:linear-gradient(90deg,var(--clover),var(--gold),var(--rose));
+    opacity:.7;
+  }
+  .intro-card p{margin-bottom:16px;font-size:1rem}
+  .intro-card p:last-child{margin-bottom:0}
+  .intro-lead{font-family:"Zen Maru Gothic";font-weight:500;color:var(--sage-deep);font-size:1.06rem}
+
+  .note{
+    margin-top:20px;background:var(--paper-2);border-radius:14px;
+    padding:14px 18px;font-size:.9rem;color:var(--ink-soft);
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .note b{color:var(--sage-deep);font-weight:700}
+
+  /* buttons */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    font-family:"Zen Maru Gothic";font-weight:700;font-size:1.05rem;
+    color:#fff;background:linear-gradient(135deg,var(--sage),var(--sage-deep));
+    border:none;border-radius:999px;padding:16px 40px;cursor:pointer;
+    box-shadow:0 8px 22px rgba(109,138,85,.28);
+    transition:transform .18s ease,box-shadow .18s ease;width:100%;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(109,138,85,.34)}
+  .btn:active{transform:translateY(0)}
+  .btn.rose{background:linear-gradient(135deg,var(--rose),var(--rose-deep));box-shadow:0 8px 22px rgba(217,138,134,.3)}
+  .btn.ghost{background:#fff;color:var(--sage-deep);border:1.5px solid var(--line);box-shadow:var(--shadow-sm)}
+  .btn.ghost:hover{box-shadow:var(--shadow)}
+  .btn-row{margin-top:28px}
+
+  /* ---- quiz ---- */
+  .progress-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
+  .progress-head .q-count{font-family:"Zen Maru Gothic";font-weight:700;color:var(--sage-deep);font-size:.95rem}
+  .progress-head .q-count b{font-size:1.4rem;color:var(--rose-deep)}
+  .progress-head .q-cat{font-size:.8rem;color:var(--ink-soft);letter-spacing:.08em}
+  .bar{height:8px;background:var(--paper-2);border-radius:999px;overflow:hidden;margin-bottom:34px}
+  .bar-fill{height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--clover),var(--sage));transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+  .q-text{
+    font-family:"Zen Maru Gothic";font-weight:500;font-size:1.5rem;line-height:1.6;
+    color:var(--ink);margin-bottom:36px;min-height:2.4em;
+  }
+  .q-mark{color:var(--clover);font-size:1.1rem;margin-right:2px}
+
+  .choices{display:flex;flex-direction:column;gap:14px}
+  .choice{
+    font-family:"Zen Maru Gothic";font-weight:500;font-size:1.08rem;
+    background:var(--card);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 24px;cursor:pointer;color:var(--ink);text-align:left;
+    display:flex;align-items:center;gap:14px;
+    transition:all .16s ease;box-shadow:var(--shadow-sm);
+  }
+  .choice:hover{border-color:var(--clover);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .choice .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;transition:all .16s}
+  .choice.c-yes .dot{border-color:var(--sage)}
+  .choice.c-no .dot{border-color:#cdd3c2}
+  .choice:hover .dot{background:var(--clover);border-color:var(--clover)}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:26px;
+    background:none;border:none;color:var(--ink-soft);font-size:.9rem;cursor:pointer;font-family:inherit}
+  .back-link:hover{color:var(--sage-deep)}
+  .back-link:disabled{opacity:.35;cursor:default}
+
+  /* ---- result ---- */
+  .result-badge{
+    display:inline-flex;align-items:center;gap:8px;font-family:"Zen Maru Gothic";
+    font-size:.82rem;letter-spacing:.12em;color:var(--rose-deep);
+    background:#fff;border:1px solid #f0d9d8;padding:6px 16px;border-radius:999px;
+    margin-bottom:20px;box-shadow:var(--shadow-sm);
+  }
+  .type-emoji{font-size:3.4rem;line-height:1;margin-bottom:14px;display:block}
+  .type-name{font-family:"Zen Maru Gothic";font-weight:700;font-size:2rem;color:var(--ink);margin-bottom:6px}
+  .type-tag{font-family:"Zen Maru Gothic";color:var(--sage-deep);font-weight:500;font-size:1.05rem;margin-bottom:28px}
+
+  .r-card{background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:26px 24px;box-shadow:var(--shadow);margin-bottom:18px;position:relative;overflow:hidden}
+  .r-card .r-label{
+    display:inline-flex;align-items:center;gap:8px;font-family:"Zen Maru Gothic";
+    font-weight:700;font-size:.92rem;color:var(--sage-deep);margin-bottom:12px;letter-spacing:.04em;
+  }
+  .r-card .r-label .ic{width:20px;height:20px;flex:none}
+  .r-card p{font-size:1rem;color:var(--ink)}
+  .r-card.msg{background:linear-gradient(135deg,#fbf3f2,#fdf8f5);border-color:#f2dedc}
+  .r-card.msg p{font-family:"Zen Maru Gothic";font-weight:500;color:var(--rose-deep);font-size:1.08rem;line-height:1.7}
+  .r-card.step{background:linear-gradient(135deg,#f1f6ea,#f8fbf2);border-color:#e0ecd0}
+
+  .body-note{background:var(--paper-2);border-radius:16px;padding:20px 22px;margin-bottom:22px;font-size:.95rem;color:var(--ink-soft)}
+  .body-note b{color:var(--sage-deep)}
+
+  .closing{
+    text-align:center;padding:30px 24px;margin:26px 0 8px;
+    background:linear-gradient(135deg,var(--sage),var(--sage-deep));
+    border-radius:22px;color:#fff;box-shadow:var(--shadow);
+  }
+  .closing .c-em{font-size:1.6rem;margin-bottom:8px}
+  .closing h3{font-family:"Zen Maru Gothic";font-weight:700;font-size:1.25rem;margin-bottom:12px;line-height:1.6}
+  .closing p{font-size:.96rem;opacity:.95;line-height:1.8}
+  .closing .cta-line{margin-top:18px;font-family:"Zen Maru Gothic";font-weight:500;
+    background:rgba(255,255,255,.16);border-radius:12px;padding:12px 16px;font-size:.94rem}
+
+  /* ---- score list (result) ---- */
+  .score-list{display:flex;flex-direction:column;gap:14px}
+  .score-row{
+    background:var(--card);border:1.5px solid var(--line);border-radius:18px;
+    padding:18px 20px;cursor:pointer;box-shadow:var(--shadow-sm);
+    transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+    position:relative;overflow:hidden;
+  }
+  .score-row:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--clover)}
+  .score-row.top{border-color:var(--rose);background:linear-gradient(135deg,#fdf6f4,var(--card))}
+  .score-row.top::after{
+    content:"いちばん強め";position:absolute;top:0;right:0;
+    background:var(--rose);color:#fff;font-family:"Zen Maru Gothic";font-weight:700;
+    font-size:.68rem;letter-spacing:.06em;padding:4px 12px;border-bottom-left-radius:12px;
+  }
+  .score-row .sr-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .score-row .sr-emoji{font-size:1.7rem;line-height:1;flex:none}
+  .score-row .sr-name{font-family:"Zen Maru Gothic";font-weight:700;font-size:1.14rem;color:var(--ink)}
+  .score-row .sr-tag{font-size:.78rem;color:var(--ink-soft);margin-top:1px;line-height:1.4}
+  .score-row .sr-pct{margin-left:auto;font-family:"Zen Maru Gothic";font-weight:700;
+    font-size:1.5rem;color:var(--sage-deep);flex:none;line-height:1}
+  .score-row.top .sr-pct{color:var(--rose-deep)}
+  .score-row .sr-pct small{font-size:.8rem;font-weight:500}
+  .sr-track{height:12px;background:var(--paper-2);border-radius:999px;overflow:hidden}
+  .sr-fill{height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--clover),var(--sage));
+    transition:width .9s cubic-bezier(.34,1.2,.4,1)}
+  .score-row.top .sr-fill{background:linear-gradient(90deg,var(--gold),var(--rose))}
+  .score-row .sr-more{margin-top:10px;font-size:.8rem;color:var(--sage-deep);
+    font-family:"Zen Maru Gothic";font-weight:500;text-align:right}
+
+  /* ---- detail screen score badge ---- */
+  .d-score{display:inline-flex;align-items:baseline;gap:6px;
+    background:var(--paper-2);border-radius:999px;padding:8px 20px;margin-bottom:24px}
+  .d-score b{font-family:"Zen Maru Gothic";font-weight:700;font-size:1.5rem;color:var(--sage-deep)}
+  .d-score span{font-size:.82rem;color:var(--ink-soft)}
+
+  /* ---- save (screenshot) note ---- */
+  .save-note{
+    background:#fff;border:1.5px dashed var(--gold);border-radius:16px;
+    padding:16px 20px;margin:6px 0 22px;font-size:.92rem;color:var(--ink);line-height:1.7;
+  }
+  .save-note b{color:var(--sage-deep);font-weight:700}
+
+  /* ---- guide / CTA block ---- */
+  .guide{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:22px 20px;margin:22px 0 8px;box-shadow:var(--shadow-sm);
+  }
+  .guide-lead{
+    font-family:"Zen Maru Gothic";font-weight:700;color:var(--sage-deep);
+    font-size:1rem;text-align:center;margin-bottom:16px;
+  }
+  .guide-btn{margin-bottom:12px;text-decoration:none}
+  .guide-btn:last-child{margin-bottom:0}
+
+  .footer-brand{text-align:center;margin-top:40px;padding-top:24px;border-top:1px solid var(--line);
+    font-family:"Zen Maru Gothic";color:var(--ink-soft);font-size:.85rem;letter-spacing:.06em}
+  .footer-brand .big{display:block;color:var(--sage-deep);font-weight:700;font-size:1rem;margin-top:4px}
+
+  @media(max-width:480px){
+    h1{font-size:1.8rem}
+    .q-text{font-size:1.3rem}
+    .type-name{font-size:1.7rem}
+    .screen{padding:32px 0 48px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ambient leaves -->
+<div class="leaf leaf-1"><svg viewBox="0 0 100 100"><path d="M50 8C42 30 20 34 20 54c0 17 13 30 30 30s30-13 30-30C80 34 58 30 50 8z" fill="#8faa72"/><path d="M50 20v56" stroke="#6d8a55" stroke-width="2"/></svg></div>
+<div class="leaf leaf-2"><svg viewBox="0 0 100 100"><path d="M50 8C42 30 20 34 20 54c0 17 13 30 30 30s30-13 30-30C80 34 58 30 50 8z" fill="#a9c48a"/><path d="M50 20v56" stroke="#8faa72" stroke-width="2"/></svg></div>
+<div class="leaf leaf-3"><svg viewBox="0 0 100 100"><path d="M50 8C42 30 20 34 20 54c0 17 13 30 30 30s30-13 30-30C80 34 58 30 50 8z" fill="#8faa72"/><path d="M50 20v56" stroke="#6d8a55" stroke-width="2"/></svg></div>
+
+<div class="wrap">
+
+  <!-- ============ INTRO ============ -->
+  <section id="intro" class="screen active">
+    <span class="eyebrow">インナーチャイルド診断</span>
+    <h1>あなたの中の<br><span class="accent">小さなあなた</span>は、<br>今どんな気持ち？</h1>
+    <p class="sub">〜 小さい頃から培った思考のクセを、そっとのぞいてみる 〜</p>
+
+    <div class="intro-card">
+      <p class="intro-lead">「なんだか生きづらい」「がんばってるのに満たされない」</p>
+      <p>その感覚の奥には、子どもの頃のあなたが、まだそっと抱えている想いがあるのかもしれません。</p>
+      <p>この診断は、あなたを4つの「思考のクセ」からやさしく見つめます。当たり・はずれを決めるものではなくて、<b>あなた自身を知って、いたわるきっかけ</b>にしてもらえたら嬉しいです。</p>
+      <div class="note">
+        <span>🍀</span>
+        <span><b>直感でだいじょうぶ。</b>深く考えず、「あ、そうかも」と感じたら「はい」を選んでね。ぜんぶで約2〜3分です。</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="startQuiz()">はじめる</button>
+      <button class="btn ghost" id="resumeBtn" style="display:none;margin-top:12px" onclick="resumeResult()">
+        🍀 前回の結果をもう一度見る
+      </button>
+    </div>
+
+    <div class="footer-brand">Mind Self Care<span class="big">学び舎にこ</span></div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz" class="screen">
+    <div class="progress-head">
+      <div class="q-count">Q<b id="qNum">1</b> <span style="color:var(--ink-soft);font-weight:400">/ <span id="qTotal">0</span></span></div>
+      <div class="q-cat" id="qCat"></div>
+    </div>
+    <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+
+    <div class="q-text"><span class="q-mark">Q.</span><span id="qText"></span></div>
+
+    <div class="choices">
+      <button class="choice c-yes" onclick="answer(true)">
+        <span class="dot"></span><span>はい / あるかも</span>
+      </button>
+      <button class="choice c-no" onclick="answer(false)">
+        <span class="dot"></span><span>いいえ / あまりない</span>
+      </button>
+    </div>
+
+    <button class="back-link" id="backBtn" onclick="goBack()">← ひとつ前にもどる</button>
+  </section>
+
+  <!-- ============ RESULT ============ -->
+  <section id="result" class="screen">
+    <span class="result-badge">🌿 あなたの「思考のクセ」バランス</span>
+    <h1 style="font-size:1.7rem;margin-bottom:6px">あなたの中の<span class="accent">小さなあなた</span>は、<br>この4つの気持ちを抱えています</h1>
+    <p class="sub" style="margin-bottom:26px">〜 どれも、あなたが頑張ってきた証。気になる思考のクセをタップして、自分への声かけと小さなやさしい一歩を実践してみてね 〜</p>
+
+    <div class="score-list" id="scoreList"></div>
+
+    <p style="text-align:center;font-size:.86rem;color:var(--ink-soft);margin:8px 0 24px">
+      ▲ 名前をタップすると、その子からのメッセージが読めます
+    </p>
+
+    <div class="body-note">
+      <b>🫧 そして、からだからのサインも。</b><br>
+      肩こり・眠りの浅さ・疲れやすさ…そんな不調が続いているなら、それは心が長くがんばってきたサインかもしれません。どうか、あなたのからだも、やさしく休ませてあげてくださいね。
+    </div>
+
+    <div class="save-note">
+      📸 <b>結果は、スクショで残しておいてね。</b><br>
+      「もう一度診断する」を押すとリセットされます。気に入った言葉は、保存していつでも見返せるように🍀
+    </div>
+
+    <div class="closing">
+      <div class="c-em">🍀</div>
+      <h3>思考のクセに気づけたあなたは、<br>もう自分を大切にし始めています</h3>
+      <p>本音は、悪者じゃない。<br>イラッとした自分も、さみしくなった自分も、ぜんぶ本当のあなた。<br>今日も、あなたがあなたにやさしくいられますように。</p>
+    </div>
+
+    <!-- ===== 誘導（結果ページ） ===== -->
+    <div class="guide">
+      <div class="guide-lead">🍀 もっと、自分をたいせつにするヒントを</div>
+      <a class="btn ghost guide-btn" href="https://youtu.be/NbU3Nx5aUPY" target="_blank" rel="noopener">
+        🎬 マインドセルフケアとは？（動画を見る）
+      </a>
+      <a class="btn rose guide-btn" href="https://nico.nicofudeonline.com/event/FJK179qQpQ0m/register" target="_blank" rel="noopener">
+        💐 無料レッスン説明会に参加する
+      </a>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn ghost" onclick="restart()">もう一度診断する</button>
+    </div>
+
+    <div class="footer-brand">Mind Self Care<span class="big">学び舎にこ</span></div>
+  </section>
+
+  <!-- ============ TYPE DETAIL ============ -->
+  <section id="detail" class="screen">
+    <button class="back-link" style="margin-top:0;margin-bottom:20px" onclick="backToResult()">← 結果にもどる</button>
+    <span class="result-badge" id="dBadge">🌿</span>
+    <span class="type-emoji" id="dEmoji"></span>
+    <div class="type-name" id="dName"></div>
+    <div class="type-tag" id="dTag"></div>
+    <div class="d-score" id="dScore"></div>
+
+    <div class="r-card">
+      <div class="r-label"><span class="ic">💭</span>こんな心のクセ、ありませんか？</div>
+      <p id="dDesc"></p>
+    </div>
+
+    <div class="r-card msg">
+      <div class="r-label" style="color:var(--rose-deep)"><span class="ic">🎀</span>小さなあなたが、本当はかけてほしかった言葉</div>
+      <p id="dMsg"></p>
+    </div>
+
+    <div class="r-card step">
+      <div class="r-label"><span class="ic">🌱</span>今日からの、やさしい一歩</div>
+      <p id="dStep"></p>
+    </div>
+
+    <!-- ===== 誘導（詳細ページ末尾） ===== -->
+    <div class="guide">
+      <div class="guide-lead">🍀 もっと、自分をたいせつにするヒントを</div>
+      <a class="btn ghost guide-btn" href="https://youtu.be/NbU3Nx5aUPY" target="_blank" rel="noopener">
+        🎬 マインドセルフケアとは？（動画を見る）
+      </a>
+      <a class="btn rose guide-btn" href="https://nico.nicofudeonline.com/event/FJK179qQpQ0m/register" target="_blank" rel="noopener">
+        💐 無料レッスン説明会に参加する
+      </a>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn ghost" onclick="backToResult()">← 4つの結果にもどる</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ===== Questions =====
+   type: 1=ちゃんとし隊 / 2=自分後回しさん / 3=愛され確認部 / 4=自分に鬼コーチ
+   cat is display-only. Body-sign items are intentionally excluded from scoring. */
+const QUESTIONS = [
+  // ① ちゃんとし隊
+  {t:1,cat:"感情・思考",q:"「完璧でいなければ」と思ってしまう"},
+  {t:1,cat:"行動",q:"「ちゃんとしなきゃ」が、いつも頭のどこかにある"},
+  {t:1,cat:"行動",q:"がんばっているのに「まだ足りない」と感じてしまう"},
+  {t:1,cat:"行動",q:"“ちゃんとした自分”を演じ続けて、疲れている"},
+  {t:1,cat:"感情・思考",q:"完璧になってから始めよう、と思いがち"},
+  {t:1,cat:"行動",q:"予定がないと、なんだか落ち着かない"},
+  {t:1,cat:"幼い自分",q:"「もう“いい子”で頑張らなくていいよ」と言ってほしかった"},
+
+  // ② 自分後回しさん
+  {t:2,cat:"感情・思考",q:"つい、他人の顔色をうかがってしまう"},
+  {t:2,cat:"感情・思考",q:"嫌われることが、こわい"},
+  {t:2,cat:"行動",q:"嫌われたくなくて、人に合わせすぎてしまう"},
+  {t:2,cat:"感情・思考",q:"自分の気持ちを、つい後回しにしてしまう"},
+  {t:2,cat:"感情・思考",q:"いつも誰かの期待に応えようとしている"},
+  {t:2,cat:"感情・思考",q:"頼るのが苦手で、ひとりで抱え込んでしまう"},
+  {t:2,cat:"行動",q:"頼まれると断れず、自分を後回しにしてしまう"},
+  {t:2,cat:"行動",q:"つい相手を優先して、自分の気持ちがわからなくなる"},
+  {t:2,cat:"幼い自分",q:"ありのままの自分を、受け入れてほしかった"},
+
+  // ③ 愛され確認部
+  {t:3,cat:"感情・思考",q:"誰かに認めてもらえないと、不安になる"},
+  {t:3,cat:"行動",q:"誰かに必要とされていないと、不安になる"},
+  {t:3,cat:"行動",q:"「こんなにしてるのに」と、心のどこかで見返りを求めてしまう"},
+  {t:3,cat:"感情・思考",q:"特定のパートナーや友達に、依存してしまう"},
+  {t:3,cat:"行動",q:"愛されたい気持ちが強くて、無理して頑張ってしまう"},
+  {t:3,cat:"行動",q:"SNSの反応や既読が気になって、何度も見てしまう"},
+  {t:3,cat:"行動",q:"ひとりになると、さみしさや孤独感が強くなる"},
+  {t:3,cat:"幼い自分",q:"「あなたは大切な存在だよ」と教えてほしかった"},
+
+  // ④ 自分に鬼コーチ
+  {t:4,cat:"感情・思考",q:"「どうせ私なんて」と思ってしまう"},
+  {t:4,cat:"感情・思考",q:"自分に、自信が持てない"},
+  {t:4,cat:"感情・思考",q:"失敗すると「やっぱりダメ」だと感じる"},
+  {t:4,cat:"行動",q:"つい、自分を責めてしまうことが多い"},
+  {t:4,cat:"行動",q:"褒められても、素直に受け取れない（つい否定したくなる）"},
+  {t:4,cat:"感情・思考",q:"人と比べて、落ち込みやすい"},
+  {t:4,cat:"感情・思考",q:"否定されると、必要以上に落ち込む"},
+  {t:4,cat:"幼い自分",q:"「本当によく頑張ってるね」と認めてほしかった"},
+];
+
+const TYPES = {
+  1:{emoji:"🎀",name:"ちゃんとし隊",tag:"「ちゃんとしなきゃ！」が止まらない",
+     desc:"いつも「ちゃんとしなきゃ」が頭のどこかにいて、気づけば120%で走っちゃうあなた。手を抜くことに罪悪感があって、「これくらいでいいや」がなかなかできない。心の中に、ちょっと厳しい“完璧警察”が住んでるのかも🚨　でもそれは、何事にも誠実で、いいかげんにできない責任感の証。あなたが「ちゃんと」してきたから、守られてきたものがきっとたくさんあるはず。",
+     msg:"「もう“いい子”で頑張らなくていいよ。そのままのあなたで、もう十分だよ」",
+     step:"一日ひとつだけ、わざと“ちゃんとしない”をやってみる。お皿を明日に回す、適当なごはんでOKにする。「ちゃんとしなくても、大丈夫。」を、小さく体験してみてね🌱"},
+  2:{emoji:"🍀",name:"自分後回しさん",tag:"人に合わせて、ひとりで抱え込んじゃう",
+     desc:"まわりの空気を敏感に感じ取って、つい人に合わせちゃう。頼ることや「NO」と言うことが苦手で、気づけばぜんぶ自分で抱え込んでイライラ。人の「して欲しい」には気づけるのに、自分の「して欲しい」は後回し。　それは、あなたが本当はすごく優しくて、まわりをよく見ている人だから。その気配りに救われてる人がきっといるよ。でも、あなたの優しさ、ちゃんと自分にも回してあげてね。",
+     msg:"「あなたの気持ちも、聞かせて。あなたがどうしたいかが、いちばん大事だよ」",
+     step:"今日ひとつだけ、自分の「したい」を優先してみる。飲みたい飲み物を選ぶ、みたいな小さなことでいい。「私は本当はどうしたい？」って自分に聞く練習から始めよう🌱"},
+  3:{emoji:"💐",name:"愛され確認部",tag:"「私のこと好き？」を確認したくなる",
+     desc:"誰かに認めてもらえたり、必要とされると安心する。逆に、反応がないとちょっと不安になったり、「私のこと、どう思ってるかな？」が気になっちゃう。心のどこかで「こんなにしてるのに」って、見返りをさがしてしまうことも。　それは、あなたが人とのつながりを大切にできる、愛情ゆたかな人だから。誰かを想う気持ちが人一倍強いんだよね。まずはその愛情を、いちばん近くにいる“自分自身”にも向けてあげよう。",
+     msg:"「あなたは、そこにいるだけで大切な存在。何かができなくても、ちゃんと愛されてるよ」",
+     step:"寝る前に、今日の自分に「よくやったね」って一言かけてあげましょう。誰かからの“いいね”を待つ前に、自分で自分に💮を出してあげてね🌱"},
+  4:{emoji:"🔥",name:"自分に鬼コーチ",tag:"自分へのダメ出しだけ、異常にきびしい",
+     desc:"他人には「そんなことないよ、頑張ってるよ」ってちゃんと言えるのに、自分にだけは異常にきびしい。何かあると「私が悪かった」「どうせ私なんて」って、一人反省会が止まらない。褒められても「いやいや」って受け取れなかったり。　でもそのきびしさは、あなたが本気で成長したい、ちゃんとやりたいと願ってる証でもあるの。ただ、そのコーチ、ちょっと厳しすぎるみたい。他人にかけてる優しい言葉、そのまま自分にもかけてあげていいんだよ。",
+     msg:"「失敗しても大丈夫。あなたはそのままで、じゅうぶんよく頑張ってるよ」",
+     step:"自分を責めそうになったら、「これ、親友が言ってたら私は何て返す？」って考えてみる。その優しい言葉を、自分にもかけてあげて🌱"},
+};
+const TYPE_ORDER=[1,2,3,4];
+
+let idx=0;
+const answers=new Array(QUESTIONS.length).fill(null);
+
+function startQuiz(){
+  document.getElementById('qTotal').textContent=QUESTIONS.length;
+  idx=0;
+  show('quiz');
+  renderQ();
+}
+function renderQ(){
+  const item=QUESTIONS[idx];
+  document.getElementById('qNum').textContent=idx+1;
+  document.getElementById('qCat').textContent=item.cat;
+  document.getElementById('qText').textContent=item.q;
+  document.getElementById('barFill').style.width=((idx)/QUESTIONS.length*100)+'%';
+  document.getElementById('backBtn').disabled=(idx===0);
+  // reflect prior answer state lightly (no lock)
+}
+function answer(yes){
+  answers[idx]=yes;
+  if(idx<QUESTIONS.length-1){
+    idx++;
+    renderQ();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }else{
+    document.getElementById('barFill').style.width='100%';
+    showResult();
+  }
+}
+function goBack(){
+  if(idx>0){idx--;renderQ();window.scrollTo({top:0,behavior:'smooth'});}
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+// per-type max possible (number of questions of each type)
+const MAXBYTYPE={1:0,2:0,3:0,4:0};
+QUESTIONS.forEach(q=>MAXBYTYPE[q.t]++);
+
+let lastScores={1:0,2:0,3:0,4:0};
+let lastPct={1:0,2:0,3:0,4:0};
+let topType=1;
+
+function showResult(){
+  const scores={1:0,2:0,3:0,4:0};
+  QUESTIONS.forEach((item,i)=>{ if(answers[i]) scores[item.t]++; });
+
+  renderScores(scores);
+
+  show('result');
+  window.scrollTo({top:0,behavior:'smooth'});
+  // animate bars after paint
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('#scoreList .sr-fill').forEach(f=>{
+      f.style.width=f.dataset.w+'%';
+    });
+  }));
+
+  // remember this result so the user can reopen it later
+  saveResult(scores);
+}
+
+/* ===== save / resume last result ===== */
+const SAVE_KEY='nikofude_innerchild_result';
+function saveResult(scores){
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({scores:scores, at:Date.now()}));
+  }catch(e){ /* sandbox / private mode: silently skip */ }
+}
+function loadSaved(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    return raw? JSON.parse(raw): null;
+  }catch(e){ return null; }
+}
+function renderScores(scores){
+  lastScores=scores;
+  TYPE_ORDER.forEach(t=>{ lastPct[t]=Math.round(scores[t]/MAXBYTYPE[t]*100); });
+  topType=TYPE_ORDER[0];
+  TYPE_ORDER.forEach(t=>{ if(lastPct[t]>lastPct[topType]) topType=t; });
+  const list=document.getElementById('scoreList');
+  list.innerHTML='';
+  const ordered=[...TYPE_ORDER].sort((a,b)=>lastPct[b]-lastPct[a]);
+  ordered.forEach(t=>{
+    const T=TYPES[t];
+    const row=document.createElement('div');
+    row.className='score-row'+(t===topType?' top':'');
+    row.onclick=()=>openDetail(t);
+    row.innerHTML=
+      '<div class="sr-head">'+
+        '<span class="sr-emoji">'+T.emoji+'</span>'+
+        '<div><div class="sr-name">「'+T.name+'」</div>'+
+        '<div class="sr-tag">'+T.tag+'</div></div>'+
+        '<div class="sr-pct">'+lastPct[t]+'<small>点</small></div>'+
+      '</div>'+
+      '<div class="sr-track"><div class="sr-fill" data-w="'+lastPct[t]+'"></div></div>'+
+      '<div class="sr-more">くわしく見る ›</div>';
+    list.appendChild(row);
+  });
+}
+function resumeResult(){
+  const saved=loadSaved();
+  if(!saved) return;
+  renderScores(saved.scores);
+  show('result');
+  window.scrollTo({top:0,behavior:'smooth'});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('#scoreList .sr-fill').forEach(f=>{ f.style.width=f.dataset.w+'%'; });
+  }));
+}
+// on load: if a saved result exists, offer the resume button
+(function(){
+  if(loadSaved()){
+    const b=document.getElementById('resumeBtn');
+    if(b) b.style.display='';
+  }
+})();
+
+function openDetail(t){
+  const T=TYPES[t];
+  document.getElementById('dBadge').textContent=(t===topType?'🌸 あなたが、いちばん強めのタイプ':'🌿 あなたの中にいる、この子');
+  document.getElementById('dEmoji').textContent=T.emoji;
+  document.getElementById('dName').textContent="「"+T.name+"」さん";
+  document.getElementById('dTag').textContent=T.tag;
+  document.getElementById('dScore').innerHTML='あなたの「'+T.name+'」は <b>'+lastPct[t]+'</b><span>点</span>';
+  document.getElementById('dDesc').textContent=T.desc;
+  document.getElementById('dMsg').textContent=T.msg;
+  document.getElementById('dStep').textContent=T.step;
+  show('detail');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function backToResult(){
+  show('result');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart(){
+  answers.fill(null);
+  idx=0;
+  show('intro');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
