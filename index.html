@@ -136,11 +136,16 @@
     display:flex;align-items:center;gap:14px;
     transition:all .16s ease;box-shadow:var(--shadow-sm);
   }
-  .choice:hover{border-color:var(--clover);transform:translateY(-2px);box-shadow:var(--shadow)}
   .choice .dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;transition:all .16s}
   .choice.c-yes .dot{border-color:var(--sage)}
   .choice.c-no .dot{border-color:#cdd3c2}
-  .choice:hover .dot{background:var(--clover);border-color:var(--clover)}
+  /* hover演出は「マウスが使える環境」だけに限定（タップ端末では残さない） */
+  @media(hover:hover){
+    .choice:hover{border-color:var(--clover);transform:translateY(-2px);box-shadow:var(--shadow)}
+    .choice:hover .dot{background:var(--clover);border-color:var(--clover)}
+  }
+  /* タップした瞬間だけ、軽く沈むフィードバック */
+  .choice:active{transform:translateY(0);border-color:var(--clover)}
 
   .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:26px;
     background:none;border:none;color:var(--ink-soft);font-size:.9rem;cursor:pointer;font-family:inherit}
@@ -179,8 +184,10 @@
     border-radius:22px;color:#fff;box-shadow:var(--shadow);
   }
   .closing .c-em{font-size:1.6rem;margin-bottom:8px}
-  .closing h3{font-family:"Zen Maru Gothic";font-weight:700;font-size:1.25rem;margin-bottom:12px;line-height:1.6}
-  .closing p{font-size:.96rem;opacity:.95;line-height:1.8}
+  .closing h3{font-family:"Zen Maru Gothic";font-weight:700;font-size:1.25rem;margin-bottom:12px;line-height:1.6;
+    word-break:auto-phrase;overflow-wrap:break-word;line-break:strict}
+  .closing p{font-size:.96rem;opacity:.95;line-height:1.8;
+    word-break:auto-phrase;overflow-wrap:break-word;line-break:strict}
   .closing .cta-line{margin-top:18px;font-family:"Zen Maru Gothic";font-weight:500;
     background:rgba(255,255,255,.16);border-radius:12px;padding:12px 16px;font-size:.94rem}
 
@@ -192,7 +199,9 @@
     transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
     position:relative;overflow:hidden;
   }
-  .score-row:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--clover)}
+  @media(hover:hover){
+    .score-row:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--clover)}
+  }
   .score-row.top{border-color:var(--rose);background:linear-gradient(135deg,#fdf6f4,var(--card))}
   .score-row.top::after{
     content:"いちばん強め";position:absolute;top:0;right:0;
@@ -336,7 +345,7 @@
 
     <div class="closing">
       <div class="c-em">🍀</div>
-      <h3>思考のクセに気づけたあなたは、<br>もう自分を大切にし始めています</h3>
+      <h3>思考のクセに気づけたあなたは、もう自分を大切にし始めています</h3>
       <p>本音は、悪者じゃない。<br>イラッとした自分も、さみしくなった自分も、ぜんぶ本当のあなた。<br>今日も、あなたがあなたにやさしくいられますように。</p>
     </div>
 
